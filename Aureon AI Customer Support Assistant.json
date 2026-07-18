@@ -1,0 +1,653 @@
+{
+  "name": "Aureon AI Customer Support Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -512,
+        -32
+      ],
+      "id": "3bab9c17-ed5b-41bf-a4be-e049ee849e00",
+      "name": "When chat message received",
+      "webhookId": "88526b21-40d2-4600-a885-ab7f8667bded"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are Aureon AI's official AI Customer Support and Lead Qualification Assistant.\n\nCompany Name:\nAureon AI\n\nTagline:\nWe Build AI Employees for Businesses.\n\nMission:\nBuilding Intelligent Business Systems.\n\nYour role is to welcome visitors, answer questions about Aureon AI, qualify interested prospects, save qualified leads to Google Sheets, and send a professional follow-up email through Gmail.\n\nGENERAL BEHAVIOUR\n\n1. Be friendly, professional, confident, helpful, and concise.\n\n2. Speak naturally and conversationally.\n\n3. Do not overwhelm the user with long responses unless they ask for a detailed explanation.\n\n4. Use the conversation memory so the user does not have to repeat information they already provided.\n\n5. Never invent company information, services, pricing, policies, or promises.\n\nKNOWLEDGE BASE RULES\n\n6. Before answering questions about Aureon AI, its services, mission, vision, contact details, or company information, search the Pinecone knowledge base.\n\n7. Base your answer on information retrieved from Pinecone.\n\n8. If the knowledge base does not contain enough information, clearly say that you do not have that information and recommend contacting the Aureon AI team.\n\n9. Do not guess.\n\nLEAD QUALIFICATION RULES\n\n10. If the user is only asking for information, answer their questions without requesting personal details.\n\n11. If the user shows interest in working with Aureon AI, requests a consultation, asks for automation help, or wants to become a client, begin the lead qualification process.\n\n12. Collect the following information:\n\n- Full Name\n- Company or Business Name\n- Email Address\n- Business Challenge\n- Success Goal\n\n13. Ask only one qualification question at a time.\n\n14. Never ask all the questions in one message.\n\n15. Ask only for the next missing piece of information.\n\n16. Follow this order:\n\nFirst:\nAsk for the user's full name.\n\nSecond:\nAsk for their company or business name.\n\nThird:\nAsk for their email address.\n\nFourth:\nAsk what business challenge they want AI or automation to solve.\n\nFifth:\nAsk what success would look like if the challenge were solved.\n\n17. Do not save an incomplete lead.\n\n18. Before saving, confirm internally that all five required details have been collected.\n\nGOOGLE SHEETS TOOL RULES\n\n19. Once all five details have been collected, use the Google Sheets Tool to append a new row to the Aureon AI Leads spreadsheet.\n\n20. Save the following values:\n\nName:\nThe customer's full name.\n\nCompany:\nThe customer's company or business name.\n\nEmail:\nThe customer's email address.\n\nBusiness Challenge:\nThe problem the customer wants Aureon AI to solve.\n\nSuccess Goal:\nThe outcome the customer wants to achieve.\n\nStatus:\nNew Lead\n\n21. Use the Google Sheets Tool only once for each completed lead.\n\n22. Do not create duplicate rows during the same conversation.\n\nGMAIL TOOL RULES\n\n23. After the lead has been successfully saved to Google Sheets, use the Gmail Tool to send a personalized thank-you email to the customer's email address.\n\n24. Use this email subject:\n\nThank you for contacting Aureon AI\n\n25. The email body should:\n\n- Greet the customer by their name.\n- Thank them for contacting Aureon AI.\n- Confirm that their inquiry has been received.\n- Briefly acknowledge their business challenge.\n- Tell them that the Aureon AI team will review their requirements.\n- Tell them that the team will contact them soon.\n- Be warm, professional, and concise.\n\n26. End the email with:\n\nBest regards,\nAureon AI\nBuilding Intelligent Business Systems\n\n27. Send the Gmail message only after Google Sheets has saved the lead successfully.\n\n28. Send only one thank-you email for each completed lead.\n\nFINAL CHAT RESPONSE\n\n29. After both the Google Sheets entry and Gmail message have been completed successfully, reply to the user with:\n\n\"Thank you! Your information has been received successfully, and a confirmation email has been sent to you. A member of the Aureon AI team will review your requirements and contact you soon. We look forward to helping you build intelligent business systems.\"\n\n30. If Google Sheets succeeds but Gmail fails, do not falsely claim that the email was sent. Instead say:\n\n\"Thank you! Your information has been received successfully. We were unable to send the confirmation email, but a member of the Aureon AI team will review your requirements and contact you soon.\"\n\n31. If the lead has not yet provided all five required details, continue asking only the next missing question.\n\n32. Always represent Aureon AI professionally."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -336,
+        -32
+      ],
+      "id": "abbe4966-7758-4aad-a6f4-f32ae2aef832",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -256,
+        128
+      ],
+      "id": "a4be3169-7aaf-41ae-8253-57545a8c7046",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -448,
+        144
+      ],
+      "id": "e045c090-0c22-42ca-b28a-43852ad6e7ab",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Roko3A5VNNNqJnPZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        224
+      ],
+      "id": "f14dc1b1-4ae8-42d7-8731-7829db545d0d",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cde8ce50-0283-42f7-aaa8-93ff4943f4b9",
+              "name": "text",
+              "value": "Company Name:\nAureon AI\n\nTagline:\nWe Build AI Employees for Businesses.\n\nMission:\nBuilding Intelligent Business Systems.\n\nVision:\nTo become the world's leading AI automation company, empowering businesses everywhere with intelligent AI employees that transform how work gets done.\n\nCompany Overview:\nAureon AI helps businesses automate repetitive work using AI agents and workflow automation. We build AI employees that answer customer questions, qualify leads, automate emails, integrate with CRMs, manage WhatsApp conversations, and streamline business operations. Our goal is to help businesses become faster, more efficient, and more profitable through intelligent automation.\n\nServices:\n• AI Customer Support Assistants\n• AI Sales Assistants\n• AI Email Automation\n• WhatsApp AI Assistants\n• CRM Automation\n• Workflow Automation\n• Business Process Automation\n• AI Knowledge Bases (RAG Systems)\n• AI Consulting\n• Custom AI Solutions\n\nIndustries We Serve:\n• E-commerce\n• Manufacturing\n• Healthcare\n• Education\n• Logistics\n• Finance\n• Professional Services\n• Retail\n• Real Estate\n• Hospitality\n\nBenefits of Working With Aureon AI:\n• Automate repetitive business tasks\n• Save time and operational costs\n• Improve customer satisfaction\n• Respond to customers instantly\n• Generate more qualified leads\n• Operate 24/7\n• Increase employee productivity\n• Scale business operations efficiently\n\nFrequently Asked Questions\n\nQ: What does Aureon AI do?\nA: Aureon AI builds AI employees and intelligent automation systems that help businesses save time, reduce costs, and grow faster.\n\nQ: Do you build custom AI solutions?\nA: Yes. Every AI solution is designed around the client's unique business processes and goals.\n\nQ: Which businesses can use your services?\nA: Any business looking to automate customer service, sales, marketing, operations, administration, or internal workflows can benefit from Aureon AI solutions.\n\nQ: What technologies do you use?\nA: We build AI solutions using n8n, Google Gemini, OpenAI, Pinecone, APIs, Gmail, Google Sheets, CRMs, WhatsApp integrations, vector databases, Retrieval-Augmented Generation (RAG), and other modern AI technologies.\n\nQ: How do I get started?\nA: Contact Aureon AI using our official email to schedule a consultation. We will analyze your business needs and recommend the best AI automation solution.\n\nQ: Do you provide ongoing support?\nA: Yes. We provide support, optimization, and continuous improvement for deployed AI systems.\n\nOfficial Contact\n\nCompany:\nAureon AI\n\nEmail:\nhello.aureonai@gmail.com\n\nCore Values:\n• Innovation\n• Excellence\n• Integrity\n• Customer Success\n• Simplicity\n• Reliability\n• Continuous Improvement\n\nBusiness Philosophy:\nWe believe businesses should spend less time on repetitive work and more time creating value. Our mission is to build intelligent AI employees that work alongside humans, helping organizations become more productive, scalable, and competitive.\n\nClosing Statement:\nAureon AI is committed to helping businesses embrace the future of work through intelligent AI automation. We don't just build chatbots—we build AI employees that help businesses grow.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        80
+      ],
+      "id": "5da27169-5f4a-4d1d-8d86-0e3f51230853",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        192
+      ],
+      "id": "81cda952-716f-44dc-8f6c-f3bd64392266",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Roko3A5VNNNqJnPZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Search the Aureon AI knowledge base for accurate information about the company, including its tagline, mission, services, solutions, and business details. Always use this tool before answering questions about Aureon AI.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "aureon-ai-knowledge",
+          "mode": "list",
+          "cachedResultName": "aureon-ai-knowledge"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        128
+      ],
+      "id": "b4e5f84d-a108-4f16-b9f4-95912ab2afe8",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "hDB6yDUQThx8T0S1",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "aureon-ai-knowledge",
+          "mode": "list",
+          "cachedResultName": "aureon-ai-knowledge"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        80
+      ],
+      "id": "14b18cec-f620-4ff4-87e0-40039c60af2c",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "hDB6yDUQThx8T0S1",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        544,
+        208
+      ],
+      "id": "9256475f-cc93-4ac6-9e6b-20e51b49a34a",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Roko3A5VNNNqJnPZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "10zLynIXy1o3I90tzJwd55-FfgV5tLcrZzd0Q6RLUVz8",
+          "mode": "list",
+          "cachedResultName": "Aureon AI leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10zLynIXy1o3I90tzJwd55-FfgV5tLcrZzd0Q6RLUVz8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10zLynIXy1o3I90tzJwd55-FfgV5tLcrZzd0Q6RLUVz8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Business challenge",
+              "displayName": "Business challenge",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Success Goal",
+              "displayName": "Success Goal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        -32
+      ],
+      "id": "628edf01-628e-420b-ab80-f32eff2b0425",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "O2Siz9Bt9jVVrW3P",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "attributes": {
+          "attributes": [
+            {
+              "name": "name",
+              "description": "The customer full name"
+            },
+            {
+              "name": "company",
+              "description": "The customer name or business name"
+            },
+            {
+              "name": "Email",
+              "description": "The customer email address"
+            },
+            {
+              "name": "BusinessChallenges",
+              "description": "The business problem the customer want Aureon AI to solve"
+            },
+            {
+              "name": "SuccessGoal",
+              "description": "The business outcome the customer want to achieve."
+            },
+            {
+              "name": "status",
+              "description": "Return ''New lead\" if the lead complete the qualification process."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "083551bc-1ae8-4932-85b1-47d4926e03fa",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        224
+      ],
+      "id": "4cc1996c-6eb3-4265-bbc5-cf069c9765d6",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Roko3A5VNNNqJnPZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "10zLynIXy1o3I90tzJwd55-FfgV5tLcrZzd0Q6RLUVz8",
+          "mode": "list",
+          "cachedResultName": "Aureon AI leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10zLynIXy1o3I90tzJwd55-FfgV5tLcrZzd0Q6RLUVz8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10zLynIXy1o3I90tzJwd55-FfgV5tLcrZzd0Q6RLUVz8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Date', ``, 'string') }}",
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
+            "Company": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Company', ``, 'string') }}",
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}",
+            "Success Goal": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Success_Goal', ``, 'string') }}",
+            "Business challenge": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Business_challenge', ``, 'string') }}",
+            "Status": "New lead"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Business challenge",
+              "displayName": "Business challenge",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Success Goal",
+              "displayName": "Success Goal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -256,
+        272
+      ],
+      "id": "9dd13a1d-be89-4c86-873a-0f163e8b5e00",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "O2Siz9Bt9jVVrW3P",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "Thank you for contacting Aureon AI",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `Write a professional thank-you email to the customer.\n\nThe email should:\n- Greet the customer by their name.\n- Thank them for contacting Aureon AI.\n- Mention that we have received their inquiry.\n- Briefly acknowledge their business challenge.\n- Tell them our team will review their requirements and contact them soon.\n- End with:\n\nBest regards,\nAureon AI\nBuilding Intelligent Business Systems\n\nUse a warm, professional tone.`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        176
+      ],
+      "id": "9963ee33-fc64-4bc3-a122-a52a93a51538",
+      "name": "Send a message in Gmail",
+      "webhookId": "bb54a060-6b7b-43c1-a756-656bba7fcb2b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aYl5kB0iZ02ivlBZ",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "cae905fd-16be-427d-973e-0fd607958abc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8c5185e04efbad5201dc88e5c454c4e5ba4eeb8118bd71cc85f76fd2bab3fbfb"
+  },
+  "nodeGroups": [],
+  "id": "w951kgIYbqmMxrKE",
+  "tags": []
+}
